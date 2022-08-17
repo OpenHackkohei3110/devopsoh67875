@@ -4,7 +4,7 @@
 
 resource "null_resource" "db_schema" {
   depends_on = [
-    azurerm_mssql_database.mssql_database
+     azurerm_mssql_database.mssql_database
   ]
   provisioner "local-exec" {
     command = "sqlcmd -U ${local.mssql_server_administrator_login} -P ${local.mssql_server_administrator_login_password} -S ${azurerm_mssql_server.mssql_server.fully_qualified_domain_name} -d ${local.mssql_database_name} -i ../../support/datainit/MYDrivingDB.sql -e"
