@@ -1,0 +1,14 @@
+name: validation
+on: 
+  pull_request:
+    branches:
+      - main
+jobs:
+  job1:
+    name: "lint code"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Lint terraform
+      uses: actionshub/terraform-lint@main
