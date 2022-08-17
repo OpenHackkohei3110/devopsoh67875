@@ -4,7 +4,7 @@ on:
     branches:
       - main
 jobs:
-  iac:
+  lint:
     name: "lint code"
     runs-on: ubuntu-latest
     steps:
@@ -13,6 +13,7 @@ jobs:
     - name: Lint terraform
       uses: actionshub/terraform-lint@main
   plan:
+    needs: lint
     name: "terraform plan"
     runs-on: ubuntu-latest
     steps:
@@ -21,6 +22,6 @@ jobs:
     - run: terraform init
 
     - id: plan
-      run: terraform plan -var=poko -no-color
+      run: terraform plan -var="resources_prefix=poko" -no-color
 
     - run: echo ${{ steps.plan.outputs.stdout }}
