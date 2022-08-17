@@ -31,7 +31,7 @@ jobs:
       working-directory: iac/terraform
 
     - id: plan
-      run: terraform force-unlock df2dc62d-634d-b72a-aee6-a1a2883f60e2 && terraform plan -var="resources_prefix=poko" -var="location=${{ secrets.LOCATION }}" -no-color
+      run: terraform plan -var="resources_prefix=poko" -var="location=${{ secrets.LOCATION }}" -no-color
       working-directory: iac/terraform
 
     - run: echo ${{ steps.plan.outputs.stdout }}
