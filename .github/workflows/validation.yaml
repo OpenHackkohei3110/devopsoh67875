@@ -21,6 +21,6 @@ jobs:
     - run: terraform init
 
     - id: plan
-      run: terraform plan -no-color -var=poko
+      run: terraform plan -var=poko -no-color
 
     - run: echo ${{ steps.plan.outputs.stdout }}
