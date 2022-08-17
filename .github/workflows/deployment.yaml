@@ -11,6 +11,7 @@ env:
 
 jobs:
   deployment:
+    needs: validate
     - name: Install dig
       run: sudo apt-get install -y dnsutils  # myip.sh
 
