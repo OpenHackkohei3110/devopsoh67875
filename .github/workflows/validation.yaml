@@ -42,9 +42,10 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
+          const output = `
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: \`${{ steps.plan.outputs.stdout }}\`
+            body: `${{ steps.plan.outputs.stdout }}`
           })
