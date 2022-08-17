@@ -31,7 +31,7 @@ jobs:
       working-directory: iac/terraform
 
     - name: Install dig
-      run: yum install -y bind-utils  # myip.sh
+      run: apt-get install -y dnsutils  # myip.sh
 
     - id: plan
       name: Plan
