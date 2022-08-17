@@ -17,6 +17,9 @@ jobs:
     name: "terraform plan"
     runs-on: ubuntu-latest
     steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
     - uses: hashicorp/setup-terraform@v2
 
     - run: terraform init
@@ -24,5 +27,6 @@ jobs:
 
     - id: plan
       run: terraform plan -var="resources_prefix=poko" -no-color
+      working-directory: iac/terraform
 
     - run: echo ${{ steps.plan.outputs.stdout }}
