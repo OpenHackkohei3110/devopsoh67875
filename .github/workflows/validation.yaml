@@ -30,8 +30,29 @@ jobs:
     - run: terraform init -backend-config="storage_account_name=${{ secrets.TFSTATE_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ secrets.TFSTATE_STORAGE_CONTAINER_NAME }}" -backend-config="key=${{ secrets.TFSTATE_KEY }}" -backend-config="resource_group_name=${{ secrets.TFSTATE_RESOURCES_GROUP_NAME }}"
       working-directory: iac/terraform
 
+    - name: Install dig
+      run: yum install -y bind-utils  # myip.sh
+
     - id: plan
-      run: terraform plan -var="resources_prefix=poko" -var="location=${{ secrets.LOCATION }}" -no-color
+      name: Plan
+      run: terraform plan -lock=false -var="resources_prefix=poko" -var="location=${{ secrets.LOCATION }}" -no-color
       working-directory: iac/terraform
 
-    - run: echo ${{ steps.plan.outputs.stdout }}
+    - name: Comment
+      uses: actions/github-script@v6
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+        #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+            \`\`\`${process.env.PLAN}\`\`\`
+            </details>`;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
