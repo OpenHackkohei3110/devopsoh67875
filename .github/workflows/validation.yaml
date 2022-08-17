@@ -19,7 +19,8 @@ jobs:
     steps:
     - uses: hashicorp/setup-terraform@v2
 
-    - run: cd iac/terraform && terraform init
+    - run: terraform init
+      working-directory: ./iac/terraform
 
     - id: plan
       run: terraform plan -var="resources_prefix=poko" -no-color
