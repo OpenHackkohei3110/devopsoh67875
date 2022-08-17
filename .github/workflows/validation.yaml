@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: hashicorp/setup-terraform@v2
 
-    - run: cd $GITHUB_WORKSPACE/iac/terraform && terraform init
+    - run: cd ./iac/terraform && terraform init
 
     - id: plan
       run: terraform plan -var="resources_prefix=poko" -no-color
