@@ -4,7 +4,7 @@ on:
     branches:
       - main
 jobs:
-  job1:
+  iac:
     name: "lint code"
     runs-on: ubuntu-latest
     steps:
@@ -12,3 +12,15 @@ jobs:
       uses: actions/checkout@v3
     - name: Lint terraform
       uses: actionshub/terraform-lint@main
+  plan:
+    name: "terraform plan"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: hashicorp/setup-terraform@v2
+
+    - run: terraform init
+
+    - id: plan
+      run: terraform plan -no-color -var=poko
+
+    - run: echo ${{ steps.plan.outputs.stdout }}
