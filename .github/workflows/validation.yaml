@@ -20,7 +20,7 @@ jobs:
     - uses: hashicorp/setup-terraform@v2
 
     - run: terraform init
-      working-directory: ./iac/terraform
+      working-directory: iac/terraform
 
     - id: plan
       run: terraform plan -var="resources_prefix=poko" -no-color
