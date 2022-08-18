@@ -33,3 +33,37 @@ jobs:
     - name: Validate
       run: terraform validate -no-color
       working-directory: iac/terraform
+
+name: deployment
+on:
+  push:
+    branches:
+      - main
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+jobs:
+  plan:
+    needs: plan
+    name: "Terraform plan"
+    runs-on: ubuntu-latest
+    steps:
+    - run: sudo apt-get install -y dnsutils  # myip.sh
+
+    - id: plan
+      name: Plan
+      run: terraform plan -lock=false -var="resources_prefix=poko" -var="location=${{ secrets.LOCATION }}" -no-color
+      working-directory: iac/terraform
+
+    - name: Comment
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `${{ steps.plan.outputs.stdout }}`
+          })
