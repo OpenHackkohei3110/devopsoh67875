@@ -1,4 +1,4 @@
-name: "Deploy - IaC (Bicep)"
+name: "Deploy - IaC (Terraform)"
 
 # run on push to main branch only
 on:
