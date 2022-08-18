@@ -65,14 +65,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Login to Azure with Service Principal
-      - name: "Azure Login"
-        uses: Azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       # Deploy
       - name: "Deployment"
-        uses: hashicorp/setup-terraform@v1
         run:
           terraform apply --auto-approve -var="location=${{ secrets.LOCATION }}" -var="resources_prefix=${ steps.resources_prefix.outputs.result }"
