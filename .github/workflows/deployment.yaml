@@ -26,7 +26,7 @@ jobs:
       RESOURCES_PREFIX: ${{ steps.resources_prefix.outputs.result }}
 
     steps:
-      # Checkout the repository to the GitHub Actions runner
+      # Checkout the repository to the GitHub Actions runner 
       - name: Checkout
         uses: actions/checkout@v2
 
