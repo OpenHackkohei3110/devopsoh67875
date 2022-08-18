@@ -73,6 +73,11 @@ jobs:
           result-encoding: string
           script: return context.repo.repo.toLowerCase()
 
+      - name: "Login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
       # Deploy
       - name: "Deployment"
         run: |
