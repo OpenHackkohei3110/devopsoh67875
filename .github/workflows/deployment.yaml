@@ -77,4 +77,4 @@ jobs:
       - name: "Deployment"
         run: |
           terraform init -backend-config="storage_account_name=${{ secrets.TFSTATE_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ secrets.TFSTATE_STORAGE_CONTAINER_NAME }}" -backend-config="key=${{ secrets.TFSTATE_KEY }}" -backend-config="resource_group_name=${{ secrets.TFSTATE_RESOURCES_GROUP_NAME }}" 
-          terraform apply --auto-approve -var="location=${{ secrets.LOCATION }}" -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}" 
+          terraform apply --auto-approve -var="location=${{ secrets.LOCATION }}" -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}"
