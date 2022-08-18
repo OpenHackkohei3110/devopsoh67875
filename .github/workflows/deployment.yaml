@@ -9,9 +9,9 @@ env:
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 jobs:
-  job1:
-    needs: validate
-      name: Install dig
+  plan:
+    needs: plan
+      name: "Terraform plan"
       runs-on: ubuntu-latest
       steps:
       - run: sudo apt-get install -y dnsutils  # myip.sh
