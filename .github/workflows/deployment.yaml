@@ -10,7 +10,7 @@ env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 jobs:
   plan:
-    needs: plan
+    needs: validate
     name: "Terraform plan"
     runs-on: ubuntu-latest
     steps:
