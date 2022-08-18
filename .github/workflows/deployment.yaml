@@ -73,7 +73,5 @@ jobs:
 
       # Deploy
       - name: "Deployment"
-        uses: Azure/cli@v1
-        with:
-          inlineScript: |
-            terraform apply --auto-approve -var="location=${{ secrets.LOCATION }}" -var="resources_prefix=${ steps.resources_prefix.outputs.result }"
+        run:
+          terraform apply --auto-approve -var="location=${{ secrets.LOCATION }}" -var="resources_prefix=${ steps.resources_prefix.outputs.result }"
