@@ -1,33 +1,76 @@
-name: deployment
+name: "Deploy - IaC (Bicep)"
+
+# run on push to main branch only
 on:
   push:
     branches:
       - main
+    paths:
+      - "iac/terraform/**"
+  workflow_dispatch:
+
+# Set envs
 env:
-  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  WORKDIR: "iac/terraform"
+
+# Set defaults for GitHub Actions runner
+defaults:
+  run:
+    working-directory: "iac/terraform"
+
 jobs:
-  plan:
-    needs: validate
-    name: "Terraform plan"
+  preview:
+    name: "Preview Changes"
     runs-on: ubuntu-latest
+    outputs:
+      RESOURCES_PREFIX: ${{ steps.resources_prefix.outputs.result }}
+
     steps:
-    - run: sudo apt-get install -y dnsutils  # myip.sh
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - id: plan
-      name: Plan
-      run: terraform plan -lock=false -var="resources_prefix=poko" -var="location=${{ secrets.LOCATION }}" -no-color
-      working-directory: iac/terraform
+      # Get RESOURCES_PREFIX based on the repo name
+      - name: Get repo name
+        uses: actions/github-script@v5
+        id: resources_prefix
+        with:
+          result-encoding: string
+          script: return context.repo.repo.toLowerCase()
 
-    - name: Comment
-      uses: actions/github-script@v6
-      with:
-        script: |
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `${{ steps.plan.outputs.stdout }}`
-          })
+      # Login to Azure with Service Principal
+      - name: "Login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Preview changes
+      - name: "What-If"
+        uses: Azure/cli@v1
+        with:
+          inlineScript: |
+            terraform plan --detailed-exitcode -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}" -var="location=${{ secrets.LOCATION }}" -no-color
+
+  deploy:
+    name: "Deploy"
+    needs: preview
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Login to Azure with Service Principal
+      - name: "Azure Login"
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Deploy
+      - name: "Deployment"
+        uses: Azure/cli@v1
+        with:
+          inlineScript: |
+            terraform apply --auto-approve -var="location=${{ secrets.LOCATION }}" -var="resources_prefix=${ steps.resources_prefix.outputs.result }"

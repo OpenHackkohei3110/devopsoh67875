@@ -1,0 +1,35 @@
+name: validation
+on: 
+  pull_request:
+    branches:
+      - main
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+jobs:
+  validate:
+    name: "validate"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get repo name
+      uses: actions/github-script@v6
+      id: resources_prefix
+      with:
+        result-encoding: string
+        script: return context.repo.repo.toLowerCase()
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Lint terraform
+      uses: actionshub/terraform-lint@main
+    - name: Terraform init
+      run: terraform init -backend-config="storage_account_name=${{ secrets.TFSTATE_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ secrets.TFSTATE_STORAGE_CONTAINER_NAME }}" -backend-config="key=${{ secrets.TFSTATE_KEY }}" -backend-config="resource_group_name=${{ secrets.TFSTATE_RESOURCES_GROUP_NAME }}"
+      working-directory: iac/terraform
+    - name: Terraform validate
+      run: terraform validate -no-color
+      working-directory: iac/terraform
+    - name: Plan
+      id: plan
+      run: terraform plan -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}" -var="location=${{ secrets.LOCATION }}" -no-color
+      working-directory: iac/terraform
