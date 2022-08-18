@@ -68,4 +68,4 @@ jobs:
       # Deploy
       - name: "Deployment"
         run:
-          terraform apply --auto-approve -var="location=${{ secrets.LOCATION }}" -var="resources_prefix=${ steps.resources_prefix.outputs.result }"
+          terraform apply --auto-approve -var="location=${{ secrets.LOCATION }}" -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}"
