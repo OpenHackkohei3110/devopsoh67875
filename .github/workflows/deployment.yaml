@@ -65,6 +65,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      # Get RESOURCES_PREFIX based on the repo name
+      - name: Get repo name
+        uses: actions/github-script@v5
+        id: resources_prefix
+        with:
+          result-encoding: string
+          script: return context.repo.repo.toLowerCase()
+
       # Deploy
       - name: "Deployment"
         run: |
