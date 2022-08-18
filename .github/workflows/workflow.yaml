@@ -33,13 +33,3 @@ jobs:
       id: plan
       run: terraform plan -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}" -var="location=${{ secrets.LOCATION }}" -no-color
       working-directory: iac/terraform
-    - name: Comment
-      uses: actions/github-script@v6
-      with:
-        script: |
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `${{ steps.plan.outputs.stdout }}`
-          })
