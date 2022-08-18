@@ -10,11 +10,11 @@ env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 jobs:
   validate:
-    name: "lint code"
+    name: "validate"
     runs-on: ubuntu-latest
     steps:
     - name: Get repo name
-      uses: actions/github-script@6
+      uses: actions/github-script@v6
       id: resources_prefix
       with:
         result-encoding: string
