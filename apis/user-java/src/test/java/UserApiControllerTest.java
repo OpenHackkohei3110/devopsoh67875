@@ -80,7 +80,7 @@ public class UserApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(convertObjectToJsonBytes(profile))
-        )
+        ) 
                 .andExpect(MockMvcResultMatchers.status().is5xxServerError());
     }
 

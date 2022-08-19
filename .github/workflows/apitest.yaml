@@ -5,6 +5,8 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "apis/user-java/**"
   workflow_dispatch:
 
 defaults:
@@ -22,7 +24,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'microsoft'
-          java-version: 17
+          java-version: 11
           cache: maven  # caching dependencies
       - name: "Test with Maven"
         run: mvn test

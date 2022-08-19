@@ -1,0 +1,53 @@
+name: "Build Docker image (Terraform)"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apis/user-java/**"
+
+# Set envs
+env:
+  WORKDIR: "iac/terraform"
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+defaults:
+  run:
+    working-directory: "apis/user-java"
+
+jobs:
+  build-image:
+    name: "Build Docker image (Terraform)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Version Bump"
+        id: version-bump
+        uses: phips28/gh-action-bump-version@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Login to Azure with Service Principal
+      - name: "Login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: "Docker login"
+        uses: azure/docker-login@v1
+        with:
+          login-server: "devopsoh67875cr.azurecr.io"
+          username: ${{ secrets.ARM_CLIENT_ID }}
+          password: ${{ secrets.ARM_CLIENT_SECRET }}
+
+      - name: "Docker Build and Push"
+        run: |
+          docker build . -t devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{ steps.version-bump.outputs.newTag }}
+          docker push devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{ steps.version-bump.outputs.newTag }}
+
+      # deploy api code to App Service staging slot
