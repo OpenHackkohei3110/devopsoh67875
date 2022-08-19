@@ -38,12 +38,14 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: "Docker Build and Push"
+      - name: "Docker login"
         uses: azure/docker-login@v1
         with:
           login-server: "devopsoh67875cr.azurecr.io"
           username: ${{ secrets.ARM_CLIENT_ID }}
           password: ${{ secrets.ARM_CLIENT_SECRET }}
+
+      - name: "Docker Build and Push"
         run: |
           docker build . -t devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{ steps.version-bump.outputs.newTag }}
           docker push devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{ steps.version-bump.outputs.newTag }}
