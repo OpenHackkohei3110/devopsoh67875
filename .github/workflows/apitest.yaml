@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    working-directory: "apis/user-java"
+
 jobs:
   test_code:
     name: "test code"
@@ -17,7 +21,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'microsoft'
-          version: 17
+          java-version: 17
           cache: maven  # caching dependencies
       - name: "Test with Maven"
         run: mvn test
