@@ -32,3 +32,4 @@ jobs:
           name: JUnit tests
           path: 'apis/user-java/target/surefire-reports/TEST-*.xml'
           reporter: java-junit
+          fail-on-error: false
