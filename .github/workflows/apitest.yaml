@@ -5,6 +5,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 defaults:
   run:
@@ -33,3 +34,41 @@ jobs:
           path: 'apis/user-java/target/surefire-reports/TEST-*.xml'
           reporter: java-junit
           fail-on-error: false
+      - name: "Create an issue (bug)"
+        if: failure() && github.event_name != 'pull_request'
+        run: |
+          body=### Unit Test `failure`
+              <details>
+              <summary>Workflow details</summary>
+
+              Workflow name: `${{ github.workflow }}`
+              Action: `${{ github.event_name }}`
+              Job: `${{ github.job }}`
+              PR: #${{ github.event.number }}
+              </details>
+
+              Test details: [Run #${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+              Pusher: @${{ github.actor }}
+          title='Unit Tests failure'
+          gh issue create --title "${title}" --body "${body}" --label bug --assignee ${{ github.actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Create a PR comment"
+        if: failure() && github.event_name == 'pull_request'
+        run: |
+          body=### Unit Test `failure`
+              <details>
+              <summary>Workflow details</summary>
+
+              Workflow name: `${{ github.workflow }}`
+              Action: `${{ github.event_name }}`
+              Job: `${{ github.job }}`
+              PR: #${{ github.event.number }}
+              </details>
+
+              Test details: [Run #${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+              Pusher: @${{ github.actor }}
+          gh pr comment ${{ github.event.number }} --body ${{ body }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
