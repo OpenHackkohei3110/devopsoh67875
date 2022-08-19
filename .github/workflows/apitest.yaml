@@ -1,0 +1,30 @@
+name: Test API
+
+# runs on PR
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test_code:
+    name: "test code"
+    uses: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Setup Java"
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'microsoft'
+          version: 17
+          cache: maven  # caching dependencies
+      - name: "Test with Maven"
+        run: mvn test
+      - name: "Publish Test Results"
+        if: success() || failure()
+        uses: dorny/test-reporter@v1
+        with:
+          name: JUnit tests
+          path: 'apis/user-java/reports//TEST-*.xml'
+          reporter: java-junit
