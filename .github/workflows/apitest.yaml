@@ -5,6 +5,8 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "apis/user-java/**"
   workflow_dispatch:
 
 defaults:
