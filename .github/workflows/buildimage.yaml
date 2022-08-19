@@ -28,7 +28,7 @@ jobs:
 
       - name: "Version Bump"
         id: version-bump
-        uses: phips28/gh-action-bump-version@master
+        uses: haya14busa/action-update-semver@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -47,7 +47,7 @@ jobs:
 
       - name: "Docker Build and Push"
         run: |
-          docker build . -t devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{ steps.version-bump.outputs.newTag }}
-          docker push devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{ steps.version-bump.outputs.newTag }}
+          docker build . -t devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.ref_name}}
+          docker push devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.ref_name}}
 
       # deploy api code to App Service staging slot
