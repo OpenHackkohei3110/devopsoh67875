@@ -50,3 +50,4 @@ jobs:
           docker push devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.ref_name}}
 
       # deploy api code to App Service staging slot
+      
