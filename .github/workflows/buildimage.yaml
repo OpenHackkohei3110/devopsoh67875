@@ -69,8 +69,8 @@ jobs:
       - name: "Docker Build and Push"
         uses: docker/build-push-action@v3
         with:
-          context: .
-          file: ./Dockerfile
+          context: "apis/user-java"
+          file: "apis/user-java/Dockerfile"
           push: true
           tags: ${{ github.run_id }}
 
