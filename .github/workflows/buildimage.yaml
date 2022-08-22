@@ -1,5 +1,14 @@
 name: "Build Docker image (Terraform)"
 
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apis/user-java/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
 # Set envs
 env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -9,15 +18,6 @@ env:
   RESOURCE_PREFIX: ${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
   API_NAME: "user-java"
   
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - "apis/${{ env.API_NAME }}/**"
-      - ".github/workflows/**"
-  workflow_dispatch:
-
 defaults:
   run:
     working-directory: "apis/${{ env.API_NAME }}"
