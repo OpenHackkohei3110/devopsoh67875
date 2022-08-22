@@ -15,7 +15,6 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-  RESOURCE_PREFIX: ${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
   API_NAME: "user-java"
 
 defaults:
@@ -27,12 +26,18 @@ jobs:
   build-image:
     name: "Build Docker image (Terraform)"
     runs-on: ubuntu-latest
+    outputs:
+      RESOURCES_PREFIX: ${{ steps.resources_prefix.outputs.result }}
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Dump GitHub Context"
-        run: |
-          echo '${{ toJSON(github) }}'
+      # Get RESOURCES_PREFIX based on the repo name
+      - name: Get repo name
+        uses: actions/github-script@v5
+        id: resources_prefix
+        with:
+          result-encoding: string
+          script: return context.repo.repo.toLowerCase()
 
       # Login to Azure with Service Principal
       - name: "Login to Azure"
@@ -43,20 +48,20 @@ jobs:
       - name: "Docker login"
         uses: azure/docker-login@v1
         with:
-          login-server: "${{ env.RESOURCE_PREFIX }}cr.azurecr.io"
+          login-server: "${{ steps.resources_prefix.outputs.result }}cr.azurecr.io"
           username: ${{ secrets.ARM_CLIENT_ID }}
           password: ${{ secrets.ARM_CLIENT_SECRET }}
 
       - name: "Docker Build and Push"
         run: |
-          docker build . -t ${{ env.RESOURCE_PREFIX }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
-          docker push ${{ env.RESOURCE_PREFIX }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+          docker build . -t ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+          docker push ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
 
       # deploy api code to App Service staging slot
       - name: "deploy to webapps"
         id: deploy-to-webapps
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "${{ env.RESOURCE_PREFIX }}userjava"
+          app-name: "${{ steps.resources_prefix.outputs.result }}userjava"
           # slot-name: staging
-          images: ${{ env.RESOURCE_PREFIX }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+          images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
