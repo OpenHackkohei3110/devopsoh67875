@@ -17,7 +17,7 @@ env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   RESOURCE_PREFIX: ${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
   API_NAME: "user-java"
-  
+
 defaults:
   run:
     working-directory: "apis/${{ env.API_NAME }}"
