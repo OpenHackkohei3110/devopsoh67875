@@ -7,7 +7,7 @@ on:
     paths:
       - "apis/${{ env.API_NAME }}/**"
       - ".github/workflows/**"
-  workflow_dispatch
+  workflow_dispatch:
 
 # Set envs
 env:
