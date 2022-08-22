@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "apis/${{ env.API_NAME }}/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
 
 # Set envs
 env:
@@ -11,10 +15,12 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  RESOURCE_PREFIX: ${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
+  API_NAME: "user-java"
 
 defaults:
   run:
-    working-directory: "apis/user-java"
+    working-directory: "apis/${{ env.API_NAME }}"
 
 jobs:
   build-image:
@@ -32,20 +38,20 @@ jobs:
       - name: "Docker login"
         uses: azure/docker-login@v1
         with:
-          login-server: "devopsoh67875cr.azurecr.io"
+          login-server: "${{ env.RESOURCE_PREFIX }}cr.azurecr.io"
           username: ${{ secrets.ARM_CLIENT_ID }}
           password: ${{ secrets.ARM_CLIENT_SECRET }}
 
       - name: "Docker Build and Push"
         run: |
-          docker build . -t devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.run_id}}
-          docker push devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.run_id}}
+          docker build . -t ${{ env.RESOURCE_PREFIX }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+          docker push ${{ env.RESOURCE_PREFIX }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
 
       # deploy api code to App Service staging slot
       - name: "deploy to webapps"
         id: deploy-to-webapps
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "devopsoh67875userjava"
+          app-name: "${{ env.RESOURCE_PREFIX }}userjava"
           # slot-name: staging
-          images: devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.run_id}}
+          images: ${{ env.RESOURCE_PREFIX }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
