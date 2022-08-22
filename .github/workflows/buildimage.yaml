@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "apis/user-java/**"
+      - "./github/workflows"
 
 # Set envs
 env:
