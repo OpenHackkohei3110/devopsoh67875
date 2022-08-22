@@ -67,6 +67,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Docker Metadata action
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+          tags: |
+            type=raw,value=${{ github.run_id }}
+        id: metadata
+
       # Build and Push image
       - name: "Docker Build and Push"
         uses: docker/build-push-action@v3
@@ -74,7 +82,7 @@ jobs:
           context: "apis/user-java"
           file: "apis/user-java/Dockerfile"
           push: true
-          tags: ${{ github.run_id }}
+          tags: ${{ steps.metadata.outputs.tags }}
 
       # deploy api code to App Service staging slot
       - name: "deploy to webapps"
