@@ -46,6 +46,6 @@ jobs:
         id: deploy-to-webapps
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "devopsoh67875user-java"
+          app-name: "devopsoh67875userjava"
           slot-name: staging
           images: devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.ref_name}}
