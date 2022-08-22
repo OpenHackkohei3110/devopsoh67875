@@ -20,7 +20,8 @@ env:
 
 defaults:
   run:
-    working-directory: "apis/${{ env.API_NAME }}"
+    # working-directory: "apis/${{ env.API_NAME }}"
+    working-directory: "apis/user-java"
 
 jobs:
   build-image:
