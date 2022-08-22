@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "apis/user-java/**"
-      - "./github/workflows"
 
 # Set envs
 env:
