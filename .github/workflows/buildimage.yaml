@@ -83,6 +83,7 @@ jobs:
           context: "apis/user-java"
           file: "apis/user-java/Dockerfile"
           push: true
+          tags: ${{ steps.metadata.outputs.tags }}
 
       # deploy api code to App Service staging slot
       - name: "deploy to webapps"
