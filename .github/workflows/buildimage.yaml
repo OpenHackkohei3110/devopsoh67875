@@ -71,7 +71,8 @@ jobs:
       - name: Docker Metadata action
         uses: docker/metadata-action@v3
         with:
-          images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}
+          # images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}
+          images: ghcr.io/devopsoh/api-${{ env.API_NAME }}
           tags: |
             type=raw,value=${{ github.run_id }}
         id: metadata
