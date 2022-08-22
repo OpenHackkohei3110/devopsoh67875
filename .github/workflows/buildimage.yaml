@@ -50,4 +50,10 @@ jobs:
           docker push devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.ref_name}}
 
       # deploy api code to App Service staging slot
-      
+      - name: "deploy to webapps"
+        id: deploy-to-webapps
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "devopsoh67875user-java"
+          slot-name: staging
+          images: devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.ref_name}}
