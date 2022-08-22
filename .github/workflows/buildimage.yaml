@@ -23,12 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Version Bump"
-        id: version-bump
-        uses: haya14busa/action-update-semver@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # Login to Azure with Service Principal
       - name: "Login to Azure"
         uses: Azure/login@v1
