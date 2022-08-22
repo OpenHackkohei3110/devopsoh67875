@@ -39,23 +39,39 @@ jobs:
           result-encoding: string
           script: return context.repo.repo.toLowerCase()
 
-      # Login to Azure with Service Principal
-      - name: "Login to Azure"
-        uses: Azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # # Login to Azure with Service Principal
+      # - name: "Login to Azure"
+      #   uses: Azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: "Docker login"
-        uses: azure/docker-login@v1
-        with:
-          login-server: "${{ steps.resources_prefix.outputs.result }}cr.azurecr.io"
-          username: ${{ secrets.ARM_CLIENT_ID }}
-          password: ${{ secrets.ARM_CLIENT_SECRET }}
+      # - name: "Docker login"
+      #   uses: azure/docker-login@v1
+      #   with:
+      #     login-server: "${{ steps.resources_prefix.outputs.result }}cr.azurecr.io"
+      #     username: ${{ secrets.ARM_CLIENT_ID }}
+      #     password: ${{ secrets.ARM_CLIENT_SECRET }}
 
+      # - name: "Docker Build and Push"
+      #   run: |
+      #     docker build . -t ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+      #     docker push ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+
+      # Login to GitHub Packages
+      - name: "Login to GitHub Packages"
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build and Push image
       - name: "Docker Build and Push"
-        run: |
-          docker build . -t ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
-          docker push ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ github.run_id }}
 
       # deploy api code to App Service staging slot
       - name: "deploy to webapps"
