@@ -26,6 +26,8 @@ jobs:
   build-image:
     name: "Build Docker image (Terraform)"
     runs-on: ubuntu-latest
+    permissions:
+      packages: write    
     outputs:
       RESOURCES_PREFIX: ${{ steps.resources_prefix.outputs.result }}
     steps:
