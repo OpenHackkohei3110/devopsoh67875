@@ -30,6 +30,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: "Dump GitHub Context"
+        run: |
+          echo '${{ toJSON(github) }}'
+
       # Login to Azure with Service Principal
       - name: "Login to Azure"
         uses: Azure/login@v1
