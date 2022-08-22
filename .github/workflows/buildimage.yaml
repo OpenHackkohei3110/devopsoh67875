@@ -38,8 +38,8 @@ jobs:
 
       - name: "Docker Build and Push"
         run: |
-          docker build . -t devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.ref_name}}
-          docker push devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.ref_name}}
+          docker build . -t devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.run_id}}
+          docker push devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.run_id}}
 
       # deploy api code to App Service staging slot
       - name: "deploy to webapps"
@@ -47,5 +47,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: "devopsoh67875userjava"
-          slot-name: staging
-          images: devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.ref_name}}
+          # slot-name: staging
+          images: devopsoh67875cr.azurecr.io/devopsoh/api-user-java:${{github.run_id}}
