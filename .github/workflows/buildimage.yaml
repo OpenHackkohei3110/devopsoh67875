@@ -71,7 +71,7 @@ jobs:
       - name: Docker Metadata action
         uses: docker/metadata-action@v3
         with:
-          images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+          images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}
           tags: |
             type=raw,value=${{ github.run_id }}
         id: metadata
@@ -83,6 +83,7 @@ jobs:
           context: "apis/user-java"
           file: "apis/user-java/Dockerfile"
           push: true
+          tags: ${{ steps.metadata.outputs.tags }}
 
       # deploy api code to App Service staging slot
       - name: "deploy to webapps"
