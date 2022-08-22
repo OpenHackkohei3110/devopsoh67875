@@ -42,11 +42,11 @@ jobs:
           result-encoding: string
           script: return context.repo.repo.toLowerCase()
 
-      # # Login to Azure with Service Principal
-      # - name: "Login to Azure"
-      #   uses: Azure/login@v1
-      #   with:
-      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # Login to Azure with Service Principal
+      - name: "Login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # - name: "Docker login"
       #   uses: azure/docker-login@v1
