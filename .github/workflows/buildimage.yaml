@@ -30,6 +30,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: "Dump GitHub Context"
+        run: |
+          echo '${{ toJSON(github) }}'
+
       # Login to Azure with Service Principal
       - name: "Login to Azure"
         uses: Azure/login@v1
@@ -54,5 +58,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: "${{ env.RESOURCE_PREFIX }}userjava"
-          # slot-name: staging
+          slot-name: staging
           images: ${{ env.RESOURCE_PREFIX }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
