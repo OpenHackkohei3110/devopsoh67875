@@ -30,6 +30,7 @@ jobs:
       packages: write    
     outputs:
       RESOURCES_PREFIX: ${{ steps.resources_prefix.outputs.result }}
+      DOCKER_IMAGE_FULL_NAME: ${{ steps.dockerfullname.outputs.DOCKER_IMAGE_FULL_NAME }}
     steps:
       - uses: actions/checkout@v2
 
@@ -82,7 +83,6 @@ jobs:
           context: "apis/user-java"
           file: "apis/user-java/Dockerfile"
           push: true
-          tags: ${{ steps.metadata.outputs.tags }}
 
       # deploy api code to App Service staging slot
       - name: "deploy to webapps"
