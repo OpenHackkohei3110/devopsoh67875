@@ -17,11 +17,6 @@ env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   API_NAME: "user-java"
 
-defaults:
-  run:
-    # working-directory: "apis/${{ env.API_NAME }}"
-    working-directory: "apis/user-java"
-
 jobs:
   build-image:
     name: "Build Docker image (Terraform)"
@@ -94,3 +89,11 @@ jobs:
           slot-name: staging
           # images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
           images: ghcr.io/OpenHackkohei3110/devopsoh/api-${{ env.API_NAME }}
+
+      # Health check
+      - name: "Check deployed service URL"
+        uses: jtalk/url-health-check-action@v2
+        with:
+          url: https://devopsoh67875userjava.azurewebsites.net//api/healthcheck/user-java
+          max-attempts: 3
+          retry-delay: 5s
