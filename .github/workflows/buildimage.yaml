@@ -52,6 +52,7 @@ jobs:
 
       - name: "Docker Build and Push"
         run: |
+          cd apis/user-java
           docker build . -t ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
           docker push ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
 
