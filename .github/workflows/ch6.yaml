@@ -22,7 +22,7 @@ jobs:
 
       - name: "Build and Push to ACR"
         run: |
-          az acr build --image devopsoh/api-poi:${{ github.run_id }} --registry devopsoh67875.azurecr.io --file apis/poi/web/Dockerfile --build-arg build_version=${{ github.run_id }} apis/poi/web
+          az acr build --image devopsoh/api-poi:${{ github.run_id }} --registry devopsoh67875cr.azurecr.io --file apis/poi/web/Dockerfile --build-arg build_version=${{ github.run_id }} apis/poi/web
 
   staging:
     name: "deploy to staging slot"
