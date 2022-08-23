@@ -71,8 +71,6 @@ jobs:
       - name: Docker Metadata action
         uses: docker/metadata-action@v3
         with:
-          # images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}
-          # images: ghcr.io/${{ github.actor }}/devopsoh/api-${{ env.API_NAME }}
           images: ghcr.io/OpenHackkohei3110/devopsoh/api-${{ env.API_NAME }}
           tags: |
             type=raw,value=${{ github.run_id }}
@@ -95,4 +93,4 @@ jobs:
           app-name: "${{ steps.resources_prefix.outputs.result }}userjava"
           # slot-name: staging
           # images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
-          images: ghcr.io/devopsoh/api-${{ env.API_NAME }}
+          images: ghcr.io/OpenHackkohei3110/devopsoh/api-${{ env.API_NAME }}
