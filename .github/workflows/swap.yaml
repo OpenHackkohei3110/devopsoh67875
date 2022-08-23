@@ -11,7 +11,7 @@ on:
 
 env:
   WORKING_DIRECTORY: "apis/userprofile"
-  REGISTRY_URI: devopsoh78828cr.azurecr.io
+  REGISTRY_URI: devopsoh67875.azurecr.io
   REPOSITORY_NAME: devopsoh/api-userprofile
   IMAGE_TAG: ${{ GITHUB.SHA }}
   API_NAME: userprofile
