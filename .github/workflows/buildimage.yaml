@@ -94,6 +94,6 @@ jobs:
       - name: "Check deployed service URL"
         uses: jtalk/url-health-check-action@v2
         with:
-          url: https://devopsoh67875userjava.azurewebsites.net/api/healthcheck/user-java
+          url: ${{ steps.deploy-to-webapps.outputs.webapp-url }}/api/healthcheck/user-java
           max-attempts: 3
           retry-delay: 5s
