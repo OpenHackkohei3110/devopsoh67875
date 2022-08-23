@@ -1,0 +1,80 @@
+name: "challenge 6 poi"
+
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: "build"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Check out"
+        uses: actions/checkout@v3
+
+      - name: "login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: "Build and Push to ACR"
+        run: |
+          az acr build --image devopsoh/api-poi:${{ github.run_id }} --registry devopsoh67875.azurecr.io --file apis/poi/web/Dockerfile --build-arg build_version=${{ github.run_id }} apis/poi/web
+
+  staging:
+    name: "deploy to staging slot"
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: poi-production
+      url: "${{ steps.deploy-to-webapp.outputs.webapp-url }}/api/version/poi"
+
+    steps:
+      - name: "login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: "deploy to webapps"
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "devopsoh67875poi"
+          slot-name: staging
+          images: "devopsoh67875.azurecr.io/devopsoh/api-poi:${{ github.run_id }}"
+
+      - name: Check the deployed service URL
+        uses: jtalk/url-health-check-action@v2
+        with:
+          # Check the following URLs one by one sequentially
+          url: "${{ steps.deploy-to-webapp.outputs.webapp-url }}/api/healthcheck/poi"
+          # Follow redirects, or just report success on 3xx status codes
+          follow-redirect: true # Optional, defaults to "false"
+          # Fail this action after this many failed attempts
+          max-attempts: 60 # Optional, defaults to 1
+          # Delay between retries
+          retry-delay: 5s # Optional, only applicable to max-attempts > 1
+          # Retry all errors, including 404. This option might trigger curl upgrade.
+          retry-all: true # Optional, defaults to "false"
+
+  swap:
+    name: "swap from staging to production"
+    needs:
+      - build
+      - staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Swap
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az webapp deployment slot swap --resource-group devopsoh67875rg --name devopsoh67875poi --slot staging --target-slot production
