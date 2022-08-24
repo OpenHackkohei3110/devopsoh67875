@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - "apis/user-java/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 
 defaults:
@@ -14,6 +15,17 @@ defaults:
     working-directory: "apis/user-java"
 
 jobs:
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}} # Only required for Organizations, not personal accounts.
+
   test_code:
     name: "test code"
     runs-on: ubuntu-latest
