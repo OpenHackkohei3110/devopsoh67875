@@ -8,6 +8,7 @@ on:
     paths:
       - "apis/user-java/**"
       - ".github/workflows/**"
+      - "iac/terraform/**"
   workflow_dispatch:
 
 defaults:
