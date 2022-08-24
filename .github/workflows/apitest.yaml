@@ -26,6 +26,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}}
+        id: gitleaks
+
+      - name: "output from gitleaks"
+        run: |
+          echo "output: ${{ steps.gitleaks.outputs.output }}"
+          echo "report: ${{ steps.gitleaks.outputs.report }}"
 
   test_code:
     name: "test code"
