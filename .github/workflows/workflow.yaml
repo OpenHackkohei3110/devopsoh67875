@@ -12,6 +12,8 @@ jobs:
   validate:
     name: "validate"
     runs-on: ubuntu-latest
+    outputs:
+      secret: ${{ steps.get-secret.outputs.secret }}
     steps:
     - name: Get repo name
       uses: actions/github-script@v6
@@ -30,7 +32,7 @@ jobs:
       with:
         azcliversion: 2.30.0
         inlineScript: |
-          az keyvault secret show --vault-name devopsoh67875kv --name SQL-PASSWORD | grep value | head -1 | cut -d'"' -f4
+          echo "::set-output name=secret::(az keyvault secret show --vault-name devopsoh67875kv --name SQL-PASSWORD | grep value | head -1 | cut -d'"' -f4)"
       id: get-secret
     - name: Lint terraform
       uses: actionshub/terraform-lint@main
@@ -42,5 +44,5 @@ jobs:
       working-directory: iac/terraform
     - name: Plan
       id: plan
-      run: terraform plan -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}" -var="location=${{ secrets.LOCATION }}" -var="mssql_server_administrator_login_password=${{ steps.get-secret.outputs.result }}" -no-color
+      run: terraform plan -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}" -var="location=${{ secrets.LOCATION }}" -var="mssql_server_administrator_login_password=${{ steps.get-secret.outputs.secret }}" -no-color
       working-directory: iac/terraform
