@@ -21,6 +21,17 @@ jobs:
         script: return context.repo.repo.toLowerCase()
     - name: Check out code
       uses: actions/checkout@v3
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Azure CLI script file
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.30.0
+        inlineScript: |
+          az keyvault secret show --vault-name devopsoh67875kv --name SQL-PASSWORD | grep value | head -1 | cut -d'"' -f4
+      id: get-secret
     - name: Lint terraform
       uses: actionshub/terraform-lint@main
     - name: Terraform init
@@ -31,5 +42,5 @@ jobs:
       working-directory: iac/terraform
     - name: Plan
       id: plan
-      run: terraform plan -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}" -var="location=${{ secrets.LOCATION }}" -no-color
+      run: terraform plan -var="resources_prefix=${{ steps.resources_prefix.outputs.result }}" -var="location=${{ secrets.LOCATION }}" -var="mssql_server_administrator_login_password=${{ steps.get-secret.outputs.result }}" -no-color
       working-directory: iac/terraform
