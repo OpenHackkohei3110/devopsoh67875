@@ -32,7 +32,8 @@ jobs:
       with:
         azcliversion: 2.30.0
         inlineScript: |
-          echo "::set-output name=secret::(az keyvault secret show --vault-name devopsoh67875kv --name SQL-PASSWORD | grep value | head -1 | cut -d'"' -f4)"
+          secret=$(az keyvault secret show --vault-name devopsoh67875kv --name SQL-PASSWORD | grep value | head -1 | cut -d'"' -f4)
+          echo "::set-output name=secret::$secret"
       id: get-secret
     - name: Lint terraform
       uses: actionshub/terraform-lint@main
