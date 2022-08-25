@@ -1,6 +1,6 @@
 version: v0.1
 testName: 'OpenHackLoadTest'
-testPlan: LoadTest.jmx
+testPlan: LoadTestUserProfile.jmx
 description: 'SampleApp Test Run'
 engineInstances: 1
 failureCriteria: 
