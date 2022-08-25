@@ -24,3 +24,8 @@ jobs:
           loadTestConfigFile: 'LoadTestUserProfileConfig.yaml'
           loadtestResource: "devopsoh67875loadtesting"
           resourceGroup: "devopsoh67875rg"
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: loadTestResults
+          path: ${{ github.workspace }}/loadTest
