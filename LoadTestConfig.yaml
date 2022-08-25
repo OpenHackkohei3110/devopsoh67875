@@ -1,5 +1,5 @@
 version: v0.1
-testName: 'OpenHack LoadTest'
+testName: 'OpenHackLoadTest'
 testPlan: LoadTest.jmx
 description: 'SampleApp Test Run'
 engineInstances: 1
