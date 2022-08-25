@@ -22,5 +22,5 @@ jobs:
         uses: azure/load-testing@v1
         with:
           loadTestConfigFile: 'LoadTestConfig.yaml'
-          LOAD_TEST_RESOURCE: "devopsoh67875loadtesting"
-          LOAD_TEST_RESOURCE_GROUP: "devopsoh67875rg"
+          loadtestResource: "devopsoh67875loadtesting"
+          resourceGroup: "devopsoh67875rg"
