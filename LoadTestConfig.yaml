@@ -2,7 +2,7 @@ version: v0.1
 testName: 'OpenHackLoadTest'
 testPlan: LoadTest.jmx
 description: 'SampleApp Test Run'
-engineInstances: 40
+engineInstances: 1
 failureCriteria: 
   - avg(response_time_ms)>60000
   - percentage(error)>20
