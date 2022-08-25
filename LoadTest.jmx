@@ -16,7 +16,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="threads_per_engine" elementType="Argument">
             <stringProp name="Argument.name">threads_per_engine</stringProp>
-            <stringProp name="Argument.value">250</stringProp>
+            <stringProp name="Argument.value">20</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="ramp_up_time" elementType="Argument">
