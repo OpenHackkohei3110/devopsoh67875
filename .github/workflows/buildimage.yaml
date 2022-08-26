@@ -1,100 +1,100 @@
-name: "Build Docker image (Terraform)"
+# name: "Build Docker image (Terraform)"
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - "apis/user-java/**"
-      - ".github/workflows/**"
-  workflow_dispatch:
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - "apis/user-java/**"
+#       - ".github/workflows/**"
+#   workflow_dispatch:
 
-# Set envs
-env:
-  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-  API_NAME: "user-java"
+# # Set envs
+# env:
+#   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+#   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+#   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+#   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+#   API_NAME: "user-java"
 
-jobs:
-  build-image:
-    name: "Build Docker image (Terraform)"
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write    
-    outputs:
-      RESOURCES_PREFIX: ${{ steps.resources_prefix.outputs.result }}
-      DOCKER_IMAGE_FULL_NAME: ${{ steps.dockerfullname.outputs.DOCKER_IMAGE_FULL_NAME }}
-    steps:
-      - uses: actions/checkout@v2
+# jobs:
+#   build-image:
+#     name: "Build Docker image (Terraform)"
+#     runs-on: ubuntu-latest
+#     permissions:
+#       packages: write    
+#     outputs:
+#       RESOURCES_PREFIX: ${{ steps.resources_prefix.outputs.result }}
+#       DOCKER_IMAGE_FULL_NAME: ${{ steps.dockerfullname.outputs.DOCKER_IMAGE_FULL_NAME }}
+#     steps:
+#       - uses: actions/checkout@v2
 
-      # Get RESOURCES_PREFIX based on the repo name
-      - name: Get repo name
-        uses: actions/github-script@v5
-        id: resources_prefix
-        with:
-          result-encoding: string
-          script: return context.repo.repo.toLowerCase()
+#       # Get RESOURCES_PREFIX based on the repo name
+#       - name: Get repo name
+#         uses: actions/github-script@v5
+#         id: resources_prefix
+#         with:
+#           result-encoding: string
+#           script: return context.repo.repo.toLowerCase()
 
-      # Login to Azure with Service Principal
-      - name: "Login to Azure"
-        uses: Azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+#       # Login to Azure with Service Principal
+#       - name: "Login to Azure"
+#         uses: Azure/login@v1
+#         with:
+#           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: "Docker login"
-        uses: azure/docker-login@v1
-        with:
-          login-server: "${{ steps.resources_prefix.outputs.result }}cr.azurecr.io"
-          username: ${{ secrets.ARM_CLIENT_ID }}
-          password: ${{ secrets.ARM_CLIENT_SECRET }}
+#       - name: "Docker login"
+#         uses: azure/docker-login@v1
+#         with:
+#           login-server: "${{ steps.resources_prefix.outputs.result }}cr.azurecr.io"
+#           username: ${{ secrets.ARM_CLIENT_ID }}
+#           password: ${{ secrets.ARM_CLIENT_SECRET }}
 
-      - name: "Docker Build and Push"
-        run: |
-          cd apis/user-java
-          docker build . -t ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
-          docker push ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+#       - name: "Docker Build and Push"
+#         run: |
+#           cd apis/user-java
+#           docker build . -t ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+#           docker push ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
 
-      # # Login to GitHub Packages
-      # - name: "Login to GitHub Packages"
-      #   uses: docker/login-action@v2
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
+#       # # Login to GitHub Packages
+#       # - name: "Login to GitHub Packages"
+#       #   uses: docker/login-action@v2
+#       #   with:
+#       #     registry: ghcr.io
+#       #     username: ${{ github.actor }}
+#       #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Docker Metadata action
-      #   uses: docker/metadata-action@v3
-      #   with:
-      #     images: ghcr.io/OpenHackkohei3110/devopsoh/api-${{ env.API_NAME }}
-      #     tags: |
-      #       type=raw,value=${{ github.run_id }}
-      #   id: metadata
+#       # - name: Docker Metadata action
+#       #   uses: docker/metadata-action@v3
+#       #   with:
+#       #     images: ghcr.io/OpenHackkohei3110/devopsoh/api-${{ env.API_NAME }}
+#       #     tags: |
+#       #       type=raw,value=${{ github.run_id }}
+#       #   id: metadata
 
-      # # Build and Push image
-      # - name: "Docker Build and Push"
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: "apis/user-java"
-      #     file: "apis/user-java/Dockerfile"
-      #     push: true
-      #     tags: ${{ steps.metadata.outputs.tags }}
+#       # # Build and Push image
+#       # - name: "Docker Build and Push"
+#       #   uses: docker/build-push-action@v3
+#       #   with:
+#       #     context: "apis/user-java"
+#       #     file: "apis/user-java/Dockerfile"
+#       #     push: true
+#       #     tags: ${{ steps.metadata.outputs.tags }}
 
-      # deploy api code to App Service staging slot
-      - name: "deploy to webapps"
-        id: deploy-to-webapps
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: "${{ steps.resources_prefix.outputs.result }}userjava"
-          slot-name: staging
-          images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
-          # images: ghcr.io/OpenHackkohei3110/devopsoh/api-${{ env.API_NAME }}
+#       # deploy api code to App Service staging slot
+#       - name: "deploy to webapps"
+#         id: deploy-to-webapps
+#         uses: azure/webapps-deploy@v2
+#         with:
+#           app-name: "${{ steps.resources_prefix.outputs.result }}userjava"
+#           slot-name: staging
+#           images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+#           # images: ghcr.io/OpenHackkohei3110/devopsoh/api-${{ env.API_NAME }}
 
-      # Health check
-      - name: "Check deployed service URL"
-        uses: jtalk/url-health-check-action@v2
-        with:
-          url: ${{ steps.deploy-to-webapps.outputs.webapp-url }}/api/healthcheck/user-java
-          max-attempts: 3
-          retry-delay: 5s
+#       # Health check
+#       - name: "Check deployed service URL"
+#         uses: jtalk/url-health-check-action@v2
+#         with:
+#           url: ${{ steps.deploy-to-webapps.outputs.webapp-url }}/api/healthcheck/user-java
+#           max-attempts: 3
+#           retry-delay: 5s

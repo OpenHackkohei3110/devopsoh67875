@@ -8,9 +8,22 @@ on:
 jobs:
   load-test:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write    
+    outputs:
+      RESOURCES_PREFIX: ${{ steps.resources_prefix.outputs.result }}
+      DOCKER_IMAGE_FULL_NAME: ${{ steps.dockerfullname.outputs.DOCKER_IMAGE_FULL_NAME }}
     steps:
       - name: Checkout GitHub actions
         uses: actions/checkout@v3
+
+      # Get RESOURCES_PREFIX based on the repo name
+      - name: Get repo name
+        uses: actions/github-script@v5
+        id: resources_prefix
+        with:
+          result-encoding: string
+          script: return context.repo.repo.toLowerCase()
 
       - name: Login to Azure
         uses: azure/login@v1
@@ -18,6 +31,39 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Docker login
+      - name: "Docker login"
+        uses: azure/docker-login@v1
+        with:
+          login-server: "${{ steps.resources_prefix.outputs.result }}cr.azurecr.io"
+          username: ${{ secrets.ARM_CLIENT_ID }}
+          password: ${{ secrets.ARM_CLIENT_SECRET }}
+
+      # Docker build & push
+      - name: "Docker Build and Push"
+        run: |
+          cd apis/user-java
+          docker build . -t ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+          docker push ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+
+      # Deploy staging
+      - name: "deploy to webapps stg"
+        id: deploy-to-webapps
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "${{ steps.resources_prefix.outputs.result }}userjava"
+          slot-name: staging
+          images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+
+      # Traffic routing to stg (ex. az webapp traffic-routing set --distribution staging=50 --name MyWebApp --resource-group MyResourceGroup)
+      - name: Traffic routing to stg
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            az webapp traffic-routing set --distribution staging=10 --name devopsoh67875userjava --resource-group devopsoh67875rg
+
+      # Load Test
       - name: Azure Load Testing
         uses: azure/load-testing@v1
         with:
@@ -29,3 +75,41 @@ jobs:
         with:
           name: loadTestResults
           path: ${{ github.workspace }}/loadTest
+
+      # test が pass した場合、prod へデプロイ
+      - name: "deploy to webapps prod"
+        if: success()
+        id: deploy-to-webapps
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "${{ steps.resources_prefix.outputs.result }}userjava"
+          images: ${{ steps.resources_prefix.outputs.result }}cr.azurecr.io/devopsoh/api-${{ env.API_NAME }}:${{github.run_id}}
+      
+      # test が failure した場合、issue を作成
+      - name: "Create an issue (fail on load test)"
+        if: failure()
+        run: |
+          body='### Load Test `failure`
+              <details>
+              <summary>Workflow details</summary>
+
+              Workflow name: `${{ github.workflow }}`
+              Action: `${{ github.event_name }}`
+              Job: `${{ github.job }}`
+              PR: #${{ github.event.number }}
+              </details>
+
+              Test details: [Run #${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+              Pusher: @${{ github.actor }}'
+          title='Load Tests failure'
+          gh issue create --title "${title}" --body "${body}" --label bug --assignee ${{ github.actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # production スロットへのルーティングを100%に修正
+      - name: Traffic routing to prod
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            az webapp traffic-routing set --distribution staging=0 --name devopsoh67875userjava --resource-group devopsoh67875rg
