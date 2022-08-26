@@ -1,31 +1,31 @@
-name: "Load Testing APIs"
+# name: "Load Testing APIs"
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  load-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout GitHub actions
-        uses: actions/checkout@v3
+# jobs:
+#   load-test:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout GitHub actions
+#         uses: actions/checkout@v3
 
-      - name: Login to Azure
-        uses: azure/login@v1
-        continue-on-error: false
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+#       - name: Login to Azure
+#         uses: azure/login@v1
+#         continue-on-error: false
+#         with:
+#           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Azure Load Testing
-        uses: azure/load-testing@v1
-        with:
-          loadTestConfigFile: 'LoadTestTripConfig.yaml'
-          loadtestResource: "devopsoh67875loadtesting"
-          resourceGroup: "devopsoh67875rg"
+#       - name: Azure Load Testing
+#         uses: azure/load-testing@v1
+#         with:
+#           loadTestConfigFile: 'LoadTestTripConfig.yaml'
+#           loadtestResource: "devopsoh67875loadtesting"
+#           resourceGroup: "devopsoh67875rg"
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: loadTestResults
-          path: ${{ github.workspace }}/loadTest
+#       - uses: actions/upload-artifact@v2
+#         with:
+#           name: loadTestResults
+#           path: ${{ github.workspace }}/loadTest
