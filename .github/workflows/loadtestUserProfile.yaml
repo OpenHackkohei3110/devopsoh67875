@@ -107,11 +107,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 7. production スロットへのルーティングを100%に修正
+      # 7. production スロットへのルーティングを100%に修正 -> ルーティング規則をクリアしなければならない
       - name: Traffic routing to prod
         uses: azure/CLI@v1
         if: success() || failure()
         with:
           azcliversion: 2.30.0
           inlineScript: |
-            az webapp traffic-routing set --distribution staging=0 --name devopsoh67875userjava --resource-group devopsoh67875rg
+            az webapp traffic-routing clear --name devopsoh67875userjava --resource-group devopsoh67875rg
