@@ -110,6 +110,7 @@ jobs:
       # 7. production スロットへのルーティングを100%に修正
       - name: Traffic routing to prod
         uses: azure/CLI@v1
+        if: success() || failure()
         with:
           azcliversion: 2.30.0
           inlineScript: |
