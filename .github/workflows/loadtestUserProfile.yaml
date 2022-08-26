@@ -48,7 +48,7 @@ jobs:
 
       # Deploy staging
       - name: "deploy to webapps stg"
-        id: deploy-to-webapps
+        id: deploy-to-webapps-stg
         uses: azure/webapps-deploy@v2
         with:
           app-name: "${{ steps.resources_prefix.outputs.result }}userjava"
@@ -79,7 +79,7 @@ jobs:
       # test が pass した場合、prod へデプロイ
       - name: "deploy to webapps prod"
         if: success()
-        id: deploy-to-webapps
+        id: deploy-to-webapps-prod
         uses: azure/webapps-deploy@v2
         with:
           app-name: "${{ steps.resources_prefix.outputs.result }}userjava"
