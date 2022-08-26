@@ -7,10 +7,10 @@ on:
 env:
   API_NAME: "user-java"
 jobs:
-  load-test:
+  canary-release:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write    
+    # permissions:
+    #   packages: write    
     outputs:
       RESOURCES_PREFIX: ${{ steps.resources_prefix.outputs.result }}
       DOCKER_IMAGE_FULL_NAME: ${{ steps.dockerfullname.outputs.DOCKER_IMAGE_FULL_NAME }}
